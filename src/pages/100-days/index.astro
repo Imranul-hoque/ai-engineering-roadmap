@@ -1,0 +1,487 @@
+---
+import Base from '../../layouts/Base.astro';
+import Eyebrow from '../../components/Eyebrow.astro';
+import Button from '../../components/Button.astro';
+import Icon from '../../components/Icon.astro';
+import StatBlock from '../../components/StatBlock.astro';
+import SectionHeader from '../../components/SectionHeader.astro';
+import { getLevel, levels } from '../../data/levels';
+import {
+  hundredDaysModules,
+  daysModuleHref,
+  dayRange,
+  TOTAL_DAYS,
+} from '../../data/hundred-days';
+import { PROJECTS_HREF, projects } from '../../data/hundred-days-projects';
+import { INTERVIEW_HREF } from '../../data/hundred-days-interview';
+
+const first = hundredDaysModules[0];
+
+/* What the track assumes; each links to its refresher module in Level 0. */
+const prerequisites = [
+  { icon: 'code', title: 'Basic Python', text: 'Write and run small scripts.', module: 1 },
+  { icon: 'cloud-download', title: 'Calling an API', text: 'Send a request and read the JSON that comes back.', module: 2 },
+  { icon: 'git-branch', title: 'Git', text: 'Commit, branch and push your code.', module: 5 },
+];
+
+/* Where the full roadmap goes deeper than this track. */
+const after = [
+  { title: 'Managed platforms and self-hosting', levels: [11] },
+  { title: 'Multimodal and voice', levels: [12] },
+  { title: 'Fine-tuning', levels: [13] },
+  { title: 'Advanced RAG and multi-agent systems', levels: [4, 5] },
+].map((a) => ({ ...a, refs: a.levels.map((n) => getLevel(n)!) }));
+
+const unitCount = hundredDaysModules.reduce((n, m) => n + m.units.length, 0);
+const publishedThrough = hundredDaysModules.at(-1)?.days[1] ?? 0;
+---
+
+<Base
+  title="100 Days of AI Engineering | CampusX"
+  description="Build, evaluate, secure and ship AI apps in 100 days. A compressed companion to the 16-level AI Engineering Roadmap."
+  page="days_overview"
+>
+  <!-- ───────────────── hero ───────────────── -->
+  <section class="dhero">
+    <div class="wrap dhero__grid">
+      <div class="dhero__copy">
+        <Eyebrow text="A companion to the roadmap" />
+        <h1 class="h1 dhero__title">100 Days of <span class="grad-text">AI Engineering</span></h1>
+        <p class="lede dhero__lede">Build, evaluate, secure and ship AI apps in 100 days.</p>
+        <div class="dhero__ctas">
+          <Button href={daysModuleHref(first)} variant="primary" size="lg" icon="arrow-right" track="days_cta_start">
+            Start Day 1
+          </Button>
+          <Button href="/" variant="secondary" size="lg" track="days_cta_full">
+            See the full roadmap
+          </Button>
+        </div>
+        <div class="dhero__stats">
+          <StatBlock value={TOTAL_DAYS} label="Days" icon="calendar-days" />
+          <StatBlock value={hundredDaysModules.length} label="Modules" icon="layers" />
+          <StatBlock value={unitCount} label="Units" icon="list-checks" />
+        </div>
+      </div>
+
+      <aside class="prereq" aria-labelledby="prereq-h">
+        <div class="prereq__head">
+          <span class="prereq__eyebrow">Before you start</span>
+          <h2 class="prereq__title" id="prereq-h">What you should already know</h2>
+        </div>
+        <ul class="prereq__list" role="list">
+          {prerequisites.map((p) => (
+            <li class="prereq__item">
+              <span class="prereq__ico"><Icon name={p.icon} size={19} /></span>
+              <span class="prereq__body">
+                <span class="prereq__name">{p.title}</span>
+                <span class="prereq__text">{p.text}</span>
+              </span>
+              <a class="prereq__ref" href={`/level/0/#m0-${p.module}`} data-track="days_prereq_click" data-track-data={String(p.module)} aria-label={`Refresh ${p.title} in Level 0`}>
+                L0 · M{p.module}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <a class="prereq__foot" href="/level/0/" data-track="days_level0_click">
+          <span>New to coding? <b>Start with Level 0 of the full roadmap.</b></span>
+          <Icon name="arrow-right" size={16} />
+        </a>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ───────────────── modules ───────────────── -->
+  <section class="section dsec" aria-labelledby="mods-h">
+    <div class="wrap">
+      <SectionHeader eyebrow="The route" title="Six modules, in order." class="dsec__head" id="mods-h" />
+
+      <div class="route" aria-hidden="true">
+        <div class="route__bar">
+          {hundredDaysModules.map((m) => (
+            <a
+              class="route__seg"
+              href={daysModuleHref(m)}
+              data-phase={m.phase}
+              style={`flex-grow:${m.days[1] - m.days[0] + 1}`}
+              tabindex="-1"
+              title={`Module ${m.number} · ${m.title} · ${dayRange(m.days)}`}
+            >{m.number}</a>
+          ))}
+        </div>
+        <div class="route__ends"><span>Day 1</span><span>Day {TOTAL_DAYS}</span></div>
+      </div>
+
+      <ol class="dmods" role="list">
+        {hundredDaysModules.map((m) => (
+          <li data-phase={m.phase}>
+            <a class="dmod" href={daysModuleHref(m)} data-track="days_module_click" data-track-data={String(m.number)}>
+              <span class="dmod__num">{m.number}</span>
+              <span class="dmod__ico"><Icon name={m.icon} size={18} /></span>
+              <span class="dmod__main">
+                <span class="dmod__title">{m.title}</span>
+                <span class="dmod__meta">{dayRange(m.days)} · {m.units.length} units</span>
+              </span>
+              <Icon name="arrow-right" size={18} class="dmod__go" />
+            </a>
+          </li>
+        ))}
+      </ol>
+      {publishedThrough < TOTAL_DAYS && (
+        <p class="dmods__more">
+          <Icon name="calendar-plus" size={14} />
+          <span>Modules for Days {publishedThrough + 1}–{TOTAL_DAYS} are added here as they're published.</span>
+        </p>
+      )}
+
+      <p class="beyond__label">After the 100 days</p>
+      <div class="dmods beyond">
+        <a class="dmod" href={PROJECTS_HREF} data-phase="frontier" data-track="days_projects_click">
+          <span class="dmod__ico"><Icon name="folder-kanban" size={18} /></span>
+          <span class="dmod__main">
+            <span class="dmod__title">Projects</span>
+            <span class="dmod__meta">{projects.length} portfolio projects · build two or three</span>
+          </span>
+          <Icon name="arrow-right" size={18} class="dmod__go" />
+        </a>
+        <a class="dmod" href={INTERVIEW_HREF} data-phase="interview" data-track="days_interview_click">
+          <span class="dmod__ico"><Icon name="messages-square" size={18} /></span>
+          <span class="dmod__main">
+            <span class="dmod__title">Interview Prep</span>
+            <span class="dmod__meta">100 questions · what a strong answer covers</span>
+          </span>
+          <Icon name="arrow-right" size={18} class="dmod__go" />
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────── after ───────────────── -->
+  <section class="section dsec dsec--gray">
+    <div class="wrap">
+      <SectionHeader
+        eyebrow="Beyond this track"
+        title="Go deeper in the full roadmap."
+        subhead="This track covers the core. For deeper or specialist topics, the full roadmap picks up where it stops."
+        class="dsec__head"
+      />
+      <ul class="after" role="list">
+        {after.map((a) => (
+          <li class="after__item">
+            <span class="after__title">{a.title}</span>
+            <span class="after__links">
+              {a.refs.map((l) => (
+                <a class="after__link" href={`/level/${l.number}/`} data-phase={l.phase} data-track="days_after_click" data-track-data={String(l.number)}>
+                  Level {l.number}
+                  <Icon name="arrow-up-right" size={13} />
+                </a>
+              ))}
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <a class="back" href="/" data-track="days_full_roadmap_click">
+        <span class="back__ico"><Icon name="route" size={18} /></span>
+        <span class="back__text">
+          Want the complete path? <b>See the full {levels.length}-level roadmap.</b>
+        </span>
+        <Icon name="arrow-right" size={18} class="back__go" />
+      </a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .dhero {
+    padding-block: 56px 48px;
+    background: linear-gradient(180deg, var(--cx-violet-bg) 0%, var(--cx-white) 82%);
+  }
+  @media (min-width: 900px) { .dhero { padding-block: 80px 64px; } }
+
+  .dhero__grid { display: grid; grid-template-columns: 1fr; gap: 40px; align-items: center; }
+  @media (min-width: 980px) { .dhero__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr); gap: 56px; } }
+
+  .dhero__copy { display: flex; flex-direction: column; gap: 20px; }
+  .dhero__title { font-size: clamp(38px, 6vw, 68px); max-width: 13ch; }
+  .dhero__lede { max-width: 44ch; }
+  .dhero__ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+
+  .dhero__stats {
+    display: grid;
+    max-width: 440px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 18px;
+    margin-top: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--cx-border);
+  }
+
+  /* ---------- prerequisites card ---------- */
+  .prereq {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--cx-white);
+    border: 1px solid var(--cx-border);
+    border-radius: 22px;
+    box-shadow: 0 18px 48px rgba(67, 56, 202, 0.1);
+  }
+  .prereq::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 4px;
+    background: var(--cx-grad);
+  }
+  .prereq__head { display: flex; flex-direction: column; gap: 6px; padding: 26px 26px 6px; }
+  .prereq__eyebrow {
+    font-family: var(--cx-font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cx-purple);
+  }
+  .prereq__title { font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+
+  .prereq__list { display: flex; flex-direction: column; gap: 10px; margin: 0; padding: 16px 20px 22px; list-style: none; }
+  .prereq__item {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: var(--cx-violet-bg);
+    border: 1px solid var(--p-violet-br);
+  }
+  .prereq__ico {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--cx-white);
+    border: 1px solid var(--p-violet-br);
+    color: var(--cx-purple);
+  }
+  .prereq__body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .prereq__name { font-family: var(--cx-font-display); font-weight: 700; font-size: 16px; color: var(--cx-ink); }
+  .prereq__text { font-size: 14px; line-height: 1.45; color: var(--cx-g600); }
+  .prereq__ref {
+    padding: 4px 9px;
+    border-radius: 999px;
+    background: var(--cx-white);
+    border: 1px solid var(--p-violet-br);
+    color: var(--cx-violet-700);
+    font-family: var(--cx-font-mono);
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    transition: border-color 0.16s ease;
+  }
+  .prereq__ref:hover { border-color: var(--cx-purple); }
+
+  .prereq__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 26px;
+    border-top: 1px solid var(--cx-border);
+    background: var(--cx-gray);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--cx-g600);
+    transition: color 0.16s ease;
+  }
+  .prereq__foot b { color: var(--cx-ink); font-weight: 600; }
+  .prereq__foot:hover, .prereq__foot:hover b { color: var(--cx-purple); }
+  .prereq__foot :global(svg) { flex: none; color: var(--cx-purple); }
+
+  /* ---------- sections ---------- */
+  .dsec { padding-block: 56px; }
+  @media (min-width: 768px) { .dsec { padding-block: 68px; } }
+  .dsec--gray { background: var(--cx-gray); border-top: 1px solid var(--cx-border); }
+  .dsec__head { margin-bottom: 28px; max-width: 640px; }
+
+  /* ---------- the route: 100 days as one proportional bar ---------- */
+  .route { margin-bottom: 28px; }
+  .route__bar { display: flex; gap: 4px; }
+  .route__seg {
+    flex-basis: 0;
+    min-width: 0;
+    display: grid;
+    place-items: center;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--phase-bg);
+    border: 1px solid var(--phase-br);
+    color: var(--phase-ac);
+    font-family: var(--cx-font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    transition: border-color 0.16s ease;
+  }
+  .route__seg:hover { border-color: var(--phase-ac); }
+  .route__ends {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-family: var(--cx-font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--cx-g500);
+  }
+
+  /* ---------- modules ---------- */
+  .dmods { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 0; padding: 0; list-style: none; }
+  @media (min-width: 820px) { .dmods { grid-template-columns: repeat(2, 1fr); gap: 12px; } }
+  .dmods > li { display: flex; }
+  .dmod {
+    flex: 1;
+    display: grid;
+    grid-template-columns: auto auto 1fr auto;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    background: var(--cx-white);
+    border: 1px solid var(--cx-border);
+    border-radius: var(--cx-r-card);
+    box-shadow: inset 4px 0 0 var(--phase-ac);
+    transition: border-color 0.16s ease, box-shadow 0.16s ease;
+  }
+  .dmod:hover { border-color: var(--phase-ac); box-shadow: inset 4px 0 0 var(--phase-ac), var(--cx-shadow-card-hover); }
+
+  .dmod__num {
+    font-family: var(--cx-font-display);
+    font-weight: 700;
+    font-size: 22px;
+    letter-spacing: -0.03em;
+    color: var(--phase-ac);
+    min-width: 18px;
+    text-align: center;
+  }
+  .dmod__ico {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 11px;
+    background: var(--phase-bg);
+    border: 1px solid var(--phase-br);
+    color: var(--phase-ac);
+  }
+  @media (max-width: 520px) {
+    .dmods li .dmod { grid-template-columns: auto 1fr auto; }
+    .dmods li .dmod__ico { display: none; }
+  }
+
+  .dmod__main { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .dmod__title { font-family: var(--cx-font-display); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; color: var(--cx-ink); }
+  .dmod__meta {
+    font-family: var(--cx-font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--cx-g600);
+  }
+
+  .dmod__go { color: var(--cx-g400); }
+  .dmod:hover .dmod__go { color: var(--phase-ac); }
+
+  .dmods__more {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-family: var(--cx-font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--cx-g500);
+  }
+
+  .beyond__label {
+    margin: 36px 0 12px;
+    font-family: var(--cx-font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cx-g500);
+  }
+  .beyond .dmod { grid-template-columns: auto 1fr auto; }
+
+  /* ---------- after ---------- */
+  .after {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  @media (min-width: 720px) { .after { grid-template-columns: repeat(2, 1fr); } }
+  .after__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 18px;
+    background: var(--cx-white);
+    border: 1px solid var(--cx-border);
+    border-radius: var(--cx-r-card-sm);
+  }
+  .after__title { font-weight: 600; font-size: 15px; line-height: 1.4; color: var(--cx-ink); }
+  .after__links { display: flex; flex-wrap: wrap; gap: 6px; flex: none; }
+  .after__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--phase-bg);
+    border: 1px solid var(--phase-br);
+    color: var(--phase-ac);
+    font-family: var(--cx-font-mono);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+  }
+  .after__link:hover { border-color: var(--phase-ac); }
+
+  .back {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 28px;
+    padding: 18px 20px;
+    background: var(--cx-white);
+    border: 1px solid var(--cx-border);
+    border-radius: var(--cx-r-card);
+    transition: border-color 0.16s ease;
+  }
+  .back:hover { border-color: var(--cx-purple); }
+  .back__ico {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 11px;
+    background: var(--cx-grad);
+    color: #fff;
+  }
+  .back__text { font-size: 15.5px; line-height: 1.45; color: var(--cx-g600); }
+  .back__text b { color: var(--cx-ink); font-weight: 600; }
+  .back__go { margin-left: auto; flex: none; color: var(--cx-purple); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dmod, .back, .route__seg, .prereq__ref, .prereq__foot { transition: none; }
+  }
+</style>

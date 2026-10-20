@@ -1,0 +1,86 @@
+---
+import Icon from './Icon.astro';
+import { CAMPUSX_ONE_URL } from '../data/courses';
+const year = new Date().getFullYear();
+---
+
+<footer class="ftr no-print">
+  <div class="wrap ftr__inner">
+    <div class="ftr__brand">
+      <span class="ftr__mark"><Icon name="route" size={18} /></span>
+      <div>
+        <p class="ftr__title">AI Engineering Roadmap</p>
+        <p class="ftr__sub">By BuildByImran</p>
+      </div>
+    </div>
+
+    <nav class="ftr__links" aria-label="Footer">
+      <a href="/" data-track="footer_full_roadmap">Full Roadmap</a>
+      <a href="/100-days/" data-track="footer_100_days">Accelerated Roadmap</a>
+      <a
+        href={CAMPUSX_ONE_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-track="campusx_cta_click"
+        data-track-data="footer"
+      >CampusX One <Icon name="arrow-up-right" size={14} /></a>
+    </nav>
+
+    <p class="ftr__legal">© {year} CampusX</p>
+  </div>
+</footer>
+
+<style>
+  .ftr { border-top: 1px solid var(--cx-border); background: var(--cx-cream); }
+  .ftr__inner {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    padding-block: 44px;
+  }
+  @media (min-width: 860px) {
+    .ftr__inner { flex-direction: row; align-items: center; justify-content: space-between; gap: 32px; }
+  }
+
+  .ftr__brand { display: flex; align-items: center; gap: 12px; }
+  .ftr__mark {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 11px;
+    background: var(--cx-grad);
+    color: #fff;
+  }
+  .ftr__title {
+    white-space: nowrap;
+    font-family: var(--cx-font-display);
+    font-weight: 700;
+    font-size: 15.5px;
+    letter-spacing: -0.02em;
+  }
+  .ftr__sub {
+    font-family: var(--cx-font-mono);
+    font-size: 9.5px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--cx-g500);
+  }
+
+  .ftr__links { display: flex; flex-wrap: wrap; gap: 10px 28px; }
+  .ftr__links a {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    white-space: nowrap;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--cx-g600);
+    transition: color 0.16s ease;
+  }
+  .ftr__links a:hover { color: var(--cx-purple); }
+
+  .ftr__legal { font-size: 13px; color: var(--cx-g500); }
+  @media (min-width: 860px) { .ftr__legal { max-width: 260px; text-align: right; } }
+</style>
